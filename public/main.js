@@ -19,7 +19,7 @@ var WordsList = React.createClass({
 		var wordNodes = this.props.data.map(function(word) {
 			return(
 				<Word data={word} />
-			)
+			);
 		});
 		return (
 			<div className="wordsList">
@@ -29,15 +29,43 @@ var WordsList = React.createClass({
 	}
 });
 
+var NewWordForm = React.createClass({
+	getInitialState: function() {
+		return {word: ""};
+	},
+	handleSubmit: function(e) {
+		e.preventDefault();
+		var word = this.state.word.trim();
+		if (!word) {
+			return;
+		}
+		this.props.onWordSubmit({word: word});
+		this.setState({word: ""});
+	},
+	handleWordChange: function(e) {
+		this.setState({word: e.target.value});
+	},
+	render: function() {
+		return (
+			<form className="newWordForm" onSubmit={this.handleSubmit}>
+				<input
+					type="text"
+					value={this.state.word}
+					onChange={this.handleWordChange}
+				/>
+				<input type="submit" value="Enter" />
+			</form>
+		);
+	}
+});
+
 var Story = React.createClass({
 	loadStory: function() {
-		console.log("loadStory");
 		$.ajax({
 			url: this.props.url,
 			dataType: "json",
 			cache: false,
 			success: function(data) {
-				console.log("ajax load success");
 				this.setState({data: data});
 			}.bind(this),
 			error: function(xhr, status, err) {
@@ -46,16 +74,27 @@ var Story = React.createClass({
 		});
 	},
 	getInitialState: function() {
-		console.log("getInitialState");
 		return {data: []};
 	},
 	componentDidMount: function() {
-		console.log("mounted");
 		this.loadStory();
 		setInterval(this.loadStory, this.props.pollInterval);
 	},
+	handleWordSubmit: function(word) {
+		$.ajax({
+			url: this.props.url,
+			dataType: "json",
+			type: "POST",
+			data: word,
+			success: function(data) {
+				this.setState({data: data});
+			}.bind(this),
+			error: function(xhr, status, err) {
+	        	console.error(this.props.url, status, err.toString());
+	      	}.bind(this)
+		});
+	},
 	render: function() {
-		console.log(this.state);
 		var wordsList;
 		if (this.state.data.length == 0) {
 			wordsList = [];
@@ -65,6 +104,7 @@ var Story = React.createClass({
 		return (
 			<div className = "story">
 				<WordsList data={wordsList}/>
+				<NewWordForm onWordSubmit={this.handleWordSubmit} />
 			</div>
 		);
 	}

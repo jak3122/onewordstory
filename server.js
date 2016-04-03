@@ -36,7 +36,6 @@ app.use(function(req, res, next) {
 });
 
 app.get('/story', function(req, res) {
-  console.log("access /story");
   fs.readFile(STORY_FILE, function(err, data) {
     if (err) {
       console.error(err);
@@ -46,32 +45,26 @@ app.get('/story', function(req, res) {
   });
 });
 
-/*
+
 app.post('/story', function(req, res) {
   fs.readFile(STORY_FILE, function(err, data) {
     if (err) {
       console.error(err);
       process.exit(1);
     }
-    var comments = JSON.parse(data);
-    // NOTE: In a real implementation, we would likely rely on a database or
-    // some other approach (e.g. UUIDs) to ensure a globally unique id. We'll
-    // treat Date.now() as unique-enough for our purposes.
-    var newComment = {
-      id: Date.now(),
-      author: req.body.author,
-      text: req.body.text,
-    };
-    comments.push(newComment);
-    fs.writeFile(STORY_FILE, JSON.stringify(comments, null, 4), function(err) {
+    var stories = JSON.parse(data);
+    var words = stories[0].words;
+    words.push(req.body.word);
+    stories[0].words = words;
+    fs.writeFile(STORY_FILE, JSON.stringify(stories, null, 4), function(err) {
       if (err) {
         console.error(err);
         process.exit(1);
       }
-      res.json(comments);
+      res.json(stories);
     });
   });
-});*/
+});
 
 
 app.listen(app.get('port'), function() {
