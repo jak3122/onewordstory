@@ -1,0 +1,12 @@
+[
+	{
+		"id": 1,
+		"words": ["Twice", "in", "a", "time", "I", "went"],
+		"users": ["Joe", "Bob"]
+	},
+	{
+		"id": 2,
+		"words": ["Hello", "dear", "friend"],
+		"users": ["Eric", "Aman"]
+	}
+]
